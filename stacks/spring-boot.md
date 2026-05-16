@@ -5,29 +5,32 @@
 - **Kotlin Version**: **Kotlin 2.x** (K2 compiler).
 - **Spring Boot**: **Spring Boot 4.x (LTS)**.
 
-## 2. Web Server (WAS) Selection
-- **Standard**: **Tomcat**. Highest maturity and standard for Enterprise. Excellent integration with Virtual Threads.
-- **High Performance / Low Footprint**: **Undertow**. Best for high throughput with minimal memory usage.
-- **Modular & Flexible**: **Jetty**. 
-  - **Why**: Lightweight and highly customizable. Ideal for embedded environments or when specific HTTP/2, HTTP/3 features and flexible connector configurations are needed. Used extensively by Google and Eclipse ecosystem.
-- **Reactive**: **Netty**. Strictly for Spring WebFlux scenarios.
+## 2. API Gateway Strategy
+- **Standard**: **Spring Cloud Gateway MVC** with **Virtual Threads**.
+  - **Why**: Higher developer productivity, easier debugging, and native compatibility with blocking libraries while maintaining high scalability via Virtual Threads.
+- **Alternative**: **Spring Cloud Gateway (Reactive)**. 
+  - **Why**: Use only for extreme high-concurrency streaming cases or when the entire stack is already reactive.
 
-## 3. Advanced Concurrency (Virtual Threads)
+## 3. Web Server (WAS) Selection
+- **Standard**: **Tomcat**. Best integration with Spring Boot 4 and Virtual Threads.
+- **Performance**: **Undertow**. Low memory footprint.
+- **Modular**: **Jetty**. High flexibility for embedded/custom HTTP needs.
+
+## 4. Advanced Concurrency (Virtual Threads)
 - **Standard**: `spring.threads.virtual.enabled=true`.
-- **Thread Pinning Caution**: Avoid `synchronized` for long I/O. Use `ReentrantLock` to prevent pinning virtual threads to carrier threads.
-- **Resource Focus**: Move away from thread pool size tuning; focus on DB pool and Memory constraints.
+- **Precaution**: Avoid `synchronized` for long I/O to prevent thread pinning. Use `ReentrantLock`.
 
-## 4. 4-Layered Architecture & DDD
-- **Interfaces, Application, Domain, Infrastructure** boundaries must be enforced.
+## 5. 4-Layered Architecture & DDD
+- Strict boundaries: **Interfaces, Application, Domain, Infrastructure**.
 
-## 5. Infrastructure Tuning (JDK 25 Optimized)
+## 6. Infrastructure & Tuning
 - **GC**: **Generational ZGC**.
 - **Memory**: `-XX:MaxRAMPercentage=70.0` (Accounting for Direct Memory).
-- **MongoDB**: `serverSelectionTimeout` tuning.
-- **HTTP Clients**: Mandatory Connect/Read timeout & Connection Pooling.
+- **Storage**: MongoDB selection timeout, HikariCP pool tuning.
+- **Clients**: Mandatory timeouts & pooling for HTTP clients.
 
-## 6. Implementation Standards (Kotlin 2)
-- **K2 Compiler** features, **kotlinx-serialization**, and idiomatic Kotlin scope functions.
+## 7. Implementation Standards (Kotlin 2)
+- **K2 Compiler**, **kotlinx-serialization**, idiomatic scope functions.
 
-## 7. Testing & Quality
+## 8. Testing & Quality
 - **JUnit 5 & MockK**, **Testcontainers**, **ArchUnit**.
