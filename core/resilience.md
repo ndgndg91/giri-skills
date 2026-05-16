@@ -1,20 +1,25 @@
 # Resilience & Stability Guide
 
 ## 1. Fault Tolerance Patterns
-- **Circuit Breaker**: Use libraries like **Resilience4j** to prevent cascading failures when external services are down.
-- **Bulkhead**: Isolate resources (e.g., separate connection pools for different services) to ensure that a failure in one area doesn't exhaust system-wide resources.
-- **Retry**: Implement retries with **exponential backoff** for transient failures, but avoid retrying on 4xx errors.
+- **Circuit Breaker**: Prevent cascading failures using Resilience4j.
+- **Bulkhead**: Isolate resources to prevent system-wide exhaustion.
+- **Retry**: Use exponential backoff for transient failures.
 
-## 2. Timeout & Resource Tuning
-- **Explicit Timeouts**: **Never use default timeouts.** Always specify `connect-timeout` and `read-timeout` for all external calls (HTTP, DB, Redis).
-- **Connection Pool Tuning (HikariCP)**: 
-  - Tune `maximum-pool-size` based on DB capacity and concurrency.
-  - Set `connection-timeout` and `max-lifetime` appropriately to prevent "connection leaked" or stale connection issues.
+## 2. Cache Stability (Anti-Cache Stampede)
+To prevent the **Cache Stampede** effect (where multiple requests hit the DB simultaneously after cache expiry), apply the following strategies:
+- **Distributed Lock**: Use a lock (e.g., Redisson) to ensure only one thread/instance updates the cache from the DB at a time.
+- **Jitter (Random TTL)**: Add a small random variation to cache TTLs to prevent multiple keys from expiring at the exact same time.
+- **Probabilistic Early Recomputation (PER)**: Recompute the cache slightly before it expires based on a probability function.
+- **Soft Expiry**: Return stale data for a short period while the cache is being refreshed in the background.
 
-## 3. Lifecycle Management
-- **Graceful Shutdown**: Enable graceful shutdown to allow in-flight requests to complete before the application process terminates.
-- **Warm-up Strategy**: For cloud environments (EKS), implement a warm-up process (e.g., pre-loading classes, pre-establishing connection pools) to prevent latency spikes on the first few requests to a new Pod.
+## 3. Timeout & Resource Tuning
+- **Explicit Timeouts**: Mandatory `connect-timeout` and `read-timeout` for all external calls.
+- **Connection Pool Tuning**: Optimize HikariCP (`maximum-pool-size`, `max-lifetime`).
 
-## 4. Scaling & Performance
-- **Auto-scaling (KEDA/HPA)**: Ensure the application metrics (CPU, Memory, or Custom Metrics) accurately reflect load for effective auto-scaling.
-- **Throttling**: Apply server-side throttling to protect the system from unexpected traffic surges.
+## 4. Lifecycle Management
+- **Graceful Shutdown**: Allow in-flight requests to complete before termination.
+- **Warm-up Strategy**: Pre-load classes and connection pools for EKS Pods.
+
+## 5. Scaling & Performance
+- **Auto-scaling (KEDA/HPA)**: Use accurate metrics for scaling.
+- **Throttling**: Protect systems from traffic surges.
