@@ -6,30 +6,36 @@
 - **NewSQL**: Strong consistency + Horizontal scalability.
 - **Redis**: Caching, Distributed Locks (Redisson), Session, Rate Limiting.
 
-## 2. Apache Kafka Guide (Producer & Consumer)
+## 2. JVM & Container Runtime (EKS/cgroup v2)
+### 2.1. Container Support & Memory
+- **cgroup v2 Compatibility**: Use Java 17+ (or 11.0.16+) for proper cgroup v2 resource detection. Ensure `-XX:+UseContainerSupport` is enabled (default in modern JVMs).
+- **Memory Settings**: Avoid fixed `-Xmx`. Use percentage-based settings to adapt to container limits:
+  - `-XX:MaxRAMPercentage=75.0` (Allow some overhead for metaspace, threads, and OS).
+  - `-XX:InitialRAMPercentage=75.0` (To avoid heap resizing overhead).
+- **OOM Handling**: Use `-XX:+ExitOnOutOfMemoryError` or `-XX:+CrashOnOutOfMemoryError` to let Kubernetes restart the Pod immediately on OOM.
 
-### 2.1. Producer Configuration (Idempotency & Ordering)
-- **Idempotent Producer**: Always set `enable.idempotence=true` to prevent duplicate messages during retries.
-- **Acks**: Set `acks=all` for maximum durability.
-- **Ordering**: Ensure `max.in.flight.requests.per.connection <= 5` (with idempotence) to maintain partition-level order.
-- **Batching**: Tune `linger.ms` and `batch.size` to balance latency and throughput.
+### 2.2. Garbage Collection (GC) Strategy
+- **G1GC**: Default for most applications. Good balance between throughput and latency.
+- **ZGC (Java 17+)**: Use for low-latency requirements (sub-millisecond pauses).
+- **Generational ZGC (Java 21+)**: Significantly improved throughput and memory efficiency over standard ZGC.
 
-### 2.2. Consumer Configuration (Reliability & Performance)
-- **Auto Commit**: **Disable auto-commit** (`enable.auto.commit=false`). Use manual acknowledgment (e.g., `AckMode.MANUAL_IMMEDIATE` in Spring Kafka) to ensure "At-Least-Once" delivery.
-- **Listener Types**:
-  - **Record Listener**: Best for simple, independent message processing.
-  - **Batch Listener**: Best for high-throughput scenarios where processing messages in chunks is more efficient.
-- **Idempotent Consumer**: Since Kafka guarantees "At-Least-Once", consumers **MUST** be idempotent. Use a unique business key (e.g., `eventId`, `orderId`) to de-duplicate processed messages in the DB/Cache.
+## 3. Apache Kafka Guide (Producer & Consumer)
+### 3.1. Producer Configuration
+- **Idempotent Producer**: `enable.idempotence=true`, `acks=all`.
+- **Ordering**: `max.in.flight.requests.per.connection <= 5`.
+### 3.2. Consumer Configuration
+- **Auto Commit**: Disable (`enable.auto.commit=false`). Use manual `AckMode.MANUAL_IMMEDIATE`.
+- **Idempotency**: Consumers MUST be idempotent using business keys.
 
-### 2.3. Error Handling & Resilience
-- **Retries**: Implement exponential backoff for transient errors.
-- **DLQ (Dead Letter Queue)**: Use a DLQ for non-recoverable errors to prevent the consumer from getting stuck (Poison Pill).
-- **Outbox Pattern**: Use the **Transactional Outbox Pattern** to ensure atomicity between DB updates and Kafka publishing.
+## 4. Consistency & Reliability Patterns
+- **Transactional Outbox Pattern**: Guarantee atomicity between DB and Kafka.
+- **Idempotency**: Design for At-Least-Once delivery.
+- **Circuit Breaker**: Use Resilience4j for external calls.
 
-## 3. Storage-Specific Tuning
-- **MongoDB**: Explicitly set `serverSelectionTimeout` and tune connection pool sizes.
-- **RDB**: Optimize indexing for query performance and use connection pooling (HikariCP) with proper timeouts.
+## 5. Storage-Specific Tuning
+- **MongoDB**: Set `serverSelectionTimeout`, tune connection pools.
+- **RDB**: Tune HikariCP (`maximum-pool-size`, `max-lifetime`).
 
-## 4. Connectivity & Security
-- **Timeouts**: Mandatory `Connect` and `Read` timeouts for all infrastructure clients.
-- **IAM**: Use IAM roles or secret managers; avoid hardcoding credentials.
+## 6. Connectivity & Security
+- **Timeouts**: Mandatory `Connect` and `Read` timeouts.
+- **IAM**: Use IAM roles/Service Accounts (IRSA in EKS).
