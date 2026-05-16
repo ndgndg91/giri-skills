@@ -7,18 +7,18 @@
 
 ## 2. API Gateway Strategy
 - **Standard**: **Spring Cloud Gateway MVC** with **Virtual Threads**.
-  - **Why**: Higher developer productivity, easier debugging, and native compatibility with blocking libraries while maintaining high scalability via Virtual Threads.
-- **Alternative**: **Spring Cloud Gateway (Reactive)**. 
-  - **Why**: Use only for extreme high-concurrency streaming cases or when the entire stack is already reactive.
+- **Alternative**: **Spring Cloud Gateway (Reactive)** for extreme high-concurrency streaming.
 
 ## 3. Web Server (WAS) Selection
-- **Standard**: **Tomcat**. Best integration with Spring Boot 4 and Virtual Threads.
-- **Performance**: **Undertow**. Low memory footprint.
-- **Modular**: **Jetty**. High flexibility for embedded/custom HTTP needs.
+- **Standard**: **Tomcat**. Best stability and integration with Virtual Threads.
+- **High Performance**: **Undertow**. 
+  - **Caution**: The default worker task queue is **unbounded**, which can lead to **OOM** under high load.
+  - **Best Practice**: Must apply **`RequestLimitingHandler`** via `WebServerFactoryCustomizer` to explicitly limit concurrent requests and queue size.
+- **Modular**: **Jetty**. High flexibility for custom HTTP needs.
 
 ## 4. Advanced Concurrency (Virtual Threads)
 - **Standard**: `spring.threads.virtual.enabled=true`.
-- **Precaution**: Avoid `synchronized` for long I/O to prevent thread pinning. Use `ReentrantLock`.
+- **Precaution**: Avoid `synchronized` for long I/O. Use `ReentrantLock`.
 
 ## 5. 4-Layered Architecture & DDD
 - Strict boundaries: **Interfaces, Application, Domain, Infrastructure**.
