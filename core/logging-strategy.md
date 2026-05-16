@@ -1,27 +1,28 @@
 # Logging Strategy & Cost Optimization
 
-## 1. Log Collection Architecture
-- **Standard**: Use **Fluent Bit** as a lightweight log processor for EKS/Container environments. It consumes fewer resources than Fluentd.
-- **Structured Logging**: All logs MUST be in **JSON format** for efficient parsing and indexing.
-- **Aggregation**: Ship logs to a central platform (**Datadog**, ELK, or Grafana Loki).
+## 1. Log Collection & Aggregation
+- **Collection**: Use **Fluent Bit** as the lightweight log processor.
+- **Aggregator Selection**:
+  - **Standard (Cost-Optimized)**: Use **Grafana Loki**.
+    - **Why**: Loki only indexes metadata (labels) and stores logs in S3, providing massive cost savings (up to 90%) compared to full-text indexing platforms.
+    - **Tip**: Keep labels lean (low cardinality) to maintain index performance.
+  - **Alternative**: Use **Datadog Logs** only for critical debugging where deep APM correlation and full-text search are indispensable.
+- **Structured Logging**: All logs MUST be in **JSON format**.
 
-## 2. Storage Tiering (Cost Optimization)
-- **Hot Storage (0-15 days)**: High-speed indexing for active troubleshooting. Keep only the most recent logs in expensive platforms like Datadog or Elasticsearch.
-- **Warm/Cold Storage (15-90+ days)**: Use cost-effective storage like **Amazon S3** for long-term retention and compliance. 
-- **Log Archiving**: Configure automatic archiving from the active platform to S3. Restore logs to the active platform only when needed for historical analysis.
+## 2. Storage Tiering (Everything as S3)
+- **Active Logs**: Keep logs indexed for 7-14 days in Loki/Datadog for troubleshooting.
+- **Archive Logs**: Store logs in **Amazon S3** with **Glacier Deep Archive** for long-term compliance (90+ days).
+- **TTL**: Define retention policies per application criticality.
 
 ## 3. Cost Reduction Tactics
-- **Log Level Management**: Ensure only `INFO` and above are logged in production. Use dynamic log level adjustment for temporary debugging.
-- **Sampling & Filtering**: 
-  - Filter out high-volume, low-value logs (e.g., frequent health checks, repeated success logs).
-  - Use sampling for high-throughput non-critical services.
-- **Drop at Source**: Drop unnecessary logs at the Fluent Bit (source) level to save network and ingestion costs.
-- **TTL (Time To Live)**: Set strict TTL policies based on business and legal requirements. Do not keep logs indefinitely in indexed storage.
+- **Drop Success Logs**: Consider dropping high-volume 200 OK logs for internal health checks.
+- **Sampling**: Apply sampling to high-throughput, non-critical log streams.
+- **Source Filtering**: Use Fluent Bit to filter out unnecessary fields or log lines before they leave the node.
 
-## 4. Privacy & Compliance
-- **Masking**: Automatically mask PII (Personal Identifiable Information) at the logger level or during collection (Fluent Bit) before it reaches the storage.
-- **Audit Logs**: Separate business audit logs (e.g., money transfer, permission changes) from system logs to ensure longer retention and higher durability.
+## 4. Observability Integration
+- **Label Alignment**: Use identical labels (e.g., `app`, `env`, `region`) across Prometheus metrics and Loki logs to enable one-click navigation in Grafana.
+- **Correlation**: Ensure `traceId` is present in every log for Trace-to-Log correlation.
 
-## 5. Observability Integration
-- **Correlation**: Ensure every log contains the **`traceId`** to allow seamless transition between Traces and Logs in Datadog.
-- **Log-to-Metric**: Generate metrics from log patterns (e.g., count of specific error strings) to monitor trends without indexing every log line.
+## 5. Privacy & Compliance
+- **Masking**: Mask PII (emails, tokens, SSNs) during log processing.
+- **Audit Logs**: Maintain high-durability audit logs separately from system debug logs.
