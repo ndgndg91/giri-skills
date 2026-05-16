@@ -1,25 +1,35 @@
 # Infrastructure & Messaging Guide
 
 ## 1. Storage Selection Criteria
-- **RDB (MySQL/PostgreSQL)**: Use for complex relationships, strict ACID transactions, and normalized data.
-- **NoSQL (MongoDB/DynamoDB)**: Use for flexible schemas, high write/read throughput, and denormalized document/Key-Value structures.
-- **NewSQL**: Use when both RDB-like strong consistency and NoSQL-like horizontal scalability are required.
-- **Redis**: Use for ultra-fast caching, distributed locks, session stores, and rate limiting.
+- **RDB (MySQL/PostgreSQL)**: Complex relationships, strict ACID, normalized data.
+- **NoSQL (MongoDB/DynamoDB)**: Flexible schemas, high throughput, denormalized documents.
+- **NewSQL**: Strong consistency + Horizontal scalability.
+- **Redis**: Caching, Distributed Locks (Redisson), Session, Rate Limiting.
 
-## 2. Messaging & Streaming (Kafka vs Others)
-### Apache Kafka: Realities & Trade-offs
-- **Partition-Level Ordering**: Kafka guarantees order **ONLY within a partition**, not globally.
-- **The Ordering Trade-off**: 
-  - To guarantee order, messages must share the same `Partition Key`.
-  - **Risk**: This can lead to **Hot Partitions**, where one partition is overwhelmed while others are idle, limiting throughput.
-- **Producer Constraints**: For strict ordering, retries must be handled carefully (e.g., using idempotent producers or `max.in.flight.requests.per.connection=1`).
-- **Consumer Parallelism**: Parallelism is limited by the number of partitions. One partition can only be consumed by one consumer thread in a group.
+## 2. Apache Kafka Guide (Producer & Consumer)
 
-## 3. Consistency & Reliability Patterns
-- **Transactional Outbox Pattern**: When saving to a DB and publishing a message (e.g., Kafka) simultaneously, use an Outbox table to guarantee atomicity and prevent data loss.
-- **Idempotency**: Always design consumers to be idempotent. Messages can be delivered multiple times (At-Least-Once delivery).
-- **Circuit Breaker**: Implement circuit breakers for external API or infrastructure calls to prevent cascading failures.
+### 2.1. Producer Configuration (Idempotency & Ordering)
+- **Idempotent Producer**: Always set `enable.idempotence=true` to prevent duplicate messages during retries.
+- **Acks**: Set `acks=all` for maximum durability.
+- **Ordering**: Ensure `max.in.flight.requests.per.connection <= 5` (with idempotence) to maintain partition-level order.
+- **Batching**: Tune `linger.ms` and `batch.size` to balance latency and throughput.
 
-## 4. Operational Considerations
-- **Connection Pooling**: Always configure and monitor connection pools (HikariCP, Lettuce) appropriately.
-- **Security**: Avoid hardcoded credentials. Use IAM roles or secret managers.
+### 2.2. Consumer Configuration (Reliability & Performance)
+- **Auto Commit**: **Disable auto-commit** (`enable.auto.commit=false`). Use manual acknowledgment (e.g., `AckMode.MANUAL_IMMEDIATE` in Spring Kafka) to ensure "At-Least-Once" delivery.
+- **Listener Types**:
+  - **Record Listener**: Best for simple, independent message processing.
+  - **Batch Listener**: Best for high-throughput scenarios where processing messages in chunks is more efficient.
+- **Idempotent Consumer**: Since Kafka guarantees "At-Least-Once", consumers **MUST** be idempotent. Use a unique business key (e.g., `eventId`, `orderId`) to de-duplicate processed messages in the DB/Cache.
+
+### 2.3. Error Handling & Resilience
+- **Retries**: Implement exponential backoff for transient errors.
+- **DLQ (Dead Letter Queue)**: Use a DLQ for non-recoverable errors to prevent the consumer from getting stuck (Poison Pill).
+- **Outbox Pattern**: Use the **Transactional Outbox Pattern** to ensure atomicity between DB updates and Kafka publishing.
+
+## 3. Storage-Specific Tuning
+- **MongoDB**: Explicitly set `serverSelectionTimeout` and tune connection pool sizes.
+- **RDB**: Optimize indexing for query performance and use connection pooling (HikariCP) with proper timeouts.
+
+## 4. Connectivity & Security
+- **Timeouts**: Mandatory `Connect` and `Read` timeouts for all infrastructure clients.
+- **IAM**: Use IAM roles or secret managers; avoid hardcoding credentials.
