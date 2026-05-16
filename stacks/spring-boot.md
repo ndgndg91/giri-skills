@@ -28,6 +28,7 @@
 - **Clients**: Mandatory timeouts & pooling for HTTP clients.
 
 ## 7. Implementation Standards (Kotlin 2)
+- **One Class, One File**: Every top-level class, interface, or enum must reside in its own file to ensure clarity and traceability.
 - **K2 Compiler**, **kotlinx-serialization**, idiomatic scope functions.
 
 ## 8. Testing & Quality
