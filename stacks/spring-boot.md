@@ -1,41 +1,32 @@
-# Spring Boot Style Guide (Kotlin & Pragmatic DDD)
+# Spring Boot Style Guide (Kotlin 2 & JDK 25 LTS)
 
-## 1. 4-Layered Architecture
-- **Interfaces (Web)**: Entry point for external systems. Handles DTO mapping and request/response.
-- **Application**: Orchestrates business use cases. Manages transactions, distributed locks, and cache coordination.
-- **Domain**: Pure business logic (Entities, VOs, Domain Services). No dependency on frameworks or infrastructure.
-- **Infrastructure**: Technical implementations (JPA, Redis, External Clients).
+## 1. Modern Runtime & Versioning
+- **JDK Version**: Use **JDK 25 (LTS)** as the standard.
+- **Kotlin Version**: Use **Kotlin 2.x** with the **K2 compiler** for improved performance and smart cast logic.
+- **Spring Boot**: Use the latest 3.x or 4.x (compatible with JDK 25).
 
-## 2. Modern Runtime (Virtual Threads)
-- **Standard**: Enable **Virtual Threads** (`spring.threads.virtual.enabled=true`) for applications running on Java 21+.
-- **Benefits**: Simplifies concurrency by allowing a blocking-style programming model while maintaining high scalability.
-- **Precaution**: Avoid long-running synchronized blocks to prevent thread pinning. Use `ReentrantLock` if necessary.
+## 2. Advanced Concurrency (JDK 25+)
+- **Virtual Threads**: Enabled by default (`spring.threads.virtual.enabled=true`).
+- **Structured Concurrency**: Use for managing multiple sub-tasks as a single unit of work to improve error handling and observability.
+- **Scoped Values**: Prefer over `ThreadLocal` for sharing immutable data between threads efficiently, especially with virtual threads.
 
-## 3. Infrastructure Tuning
+## 3. 4-Layered Architecture
+- **Interfaces (Web)**, **Application**, **Domain**, **Infrastructure** as defined in the core patterns.
 
-### 3.1. Connection Pools (HikariCP)
-- Always tune `maximum-pool-size`, `connection-timeout`, and `max-lifetime` based on production load.
+## 4. Infrastructure Tuning (Optimized for Java 25)
+- **Generational ZGC**: Recommended GC for high-throughput and low-latency requirements on JDK 25.
+- **Memory Management**: Use `-XX:MaxRAMPercentage=75.0` to respect container limits in EKS.
 
-### 3.2. MongoDB (Spring Data Mongo)
-- **Server Selection**: Explicitly configure `serverSelectionTimeout` to prevent long waits during cluster failover.
-- **Connection Pool**: Monitor and tune `max-connection-pool-size` and `min-connection-pool-size`.
+## 5. Implementation Standards (Kotlin 2)
+- **K2 Compiler Features**: Leverage improved smart casts and faster compilation.
+- **No Lombok**: Native Kotlin primary constructors and data classes.
+- **Functional Style**: Use scope functions (`let`, `run`, `apply`, `also`) and immutable collections.
 
-### 3.3. HTTP Clients (RestClient, WebClient, Feign)
-- **Timeouts**: Mandatory configuration of `Connect Timeout` and `Read Timeout`.
-- **Connection Pooling**: Use pooled connection managers (e.g., Apache HttpClient or Jetty Client) to reuse connections and avoid socket exhaustion.
+## 6. Distributed Lock & Cache
+- **Distributed Lock**: AOP-First with Redisson.
+- **Cache**: Look-aside pattern with Spring Cache or `RedisTemplate`.
 
-## 4. JPA Entity vs Domain Entity Strategy
-### Basic Principle: Pragmatic Unified Model
-- By default, use **JPA Entity as Domain Entity**. Use Kotlin's `all-open` plugin.
-
-### When to Separate
-- **Schema Mismatch**, **Domain Pollution**, or **Multiple Data Sources**.
-
-## 5. Distributed Lock & Cache
-- **Distributed Lock**: AOP-First with Redisson. Ensure lock acquisition happens outside the transaction.
-- **Cache**: Spring Cache for simple cases, `RedisTemplate` for complex logic. Use **Cache-Aside** pattern.
-
-## 6. Testing Strategy
-- **JUnit 5 & MockK** for unit tests.
-- **Testcontainers** for integration tests (DB, Redis, Mongo, Kafka).
-- **Slice Testing**: `@WebMvcTest`, `@DataJpaTest`, `@DataMongoTest`.
+## 7. Testing Strategy
+- **JUnit 5 & MockK**.
+- **Testcontainers**: Mandatory for integration tests (DB, Redis, Mongo, Kafka).
+- **Virtual Thread Testing**: Ensure tests are executed in a virtual thread environment to catch pinning issues.
