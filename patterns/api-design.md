@@ -13,25 +13,25 @@
 - **Performance**: Avoid Offset-based pagination for large datasets.
 
 ## 4. Response & Error Formats (Envelope Pattern)
-All API responses must follow a consistent envelope structure containing metadata for traceability.
+All API responses must follow a consistent envelope structure containing a **traceId** for distributed tracing and observability.
 
-### 4.1 Common Metadata (`meta`)
-- **`requestId`**: A unique identifier for the request.
-  - Priority: Value of the `X-Request-Id` HTTP header (if provided by the client).
-  - Fallback: Generate a random UUID on the server.
+### 4.1 Distributed Tracing (`meta.traceId`)
+- **`traceId`**: A unique identifier for the entire transaction across services.
+  - **Header Priority**:
+    1. `traceparent` (W3C Trace Context standard)
+    2. `X-Trace-Id` or `X-Request-Id` (legacy headers)
+  - **Fallback**: If no header is provided, the entry-point service must generate a random UUID as the `traceId`.
+  - **Propagation**: This ID must be propagated to all downstream internal calls and messaging headers (Kafka, etc.).
 - **`timestamp`**: Server-side processing completion time in milliseconds (Unix timestamp).
 
 ### 4.2 Success Response Format
 ```json
 {
   "meta": {
-    "requestId": "uuid-string",
+    "traceId": "uuid-or-traceparent",
     "timestamp": 1715827200000
   },
-  "data": {
-    "id": 1,
-    "name": "Example"
-  }
+  "data": { ... }
 }
 ```
 
@@ -39,7 +39,7 @@ All API responses must follow a consistent envelope structure containing metadat
 ```json
 {
   "meta": {
-    "requestId": "uuid-string",
+    "traceId": "uuid-or-traceparent",
     "timestamp": 1715827200000
   },
   "error": {
@@ -54,8 +54,7 @@ All API responses must follow a consistent envelope structure containing metadat
 - **GET**: 200 OK.
 - **POST**: 201 Created.
 - **PUT/PATCH/DELETE**: 200 OK or 204 No Content.
-- Standardize on appropriate 4xx and 5xx codes for errors.
 
 ## 6. General Rules
-- **Idempotency**: Ensure side-effecting operations (PUT, PATCH, DELETE) are idempotent.
+- **Idempotency**: Ensure side-effecting operations are idempotent.
 - **Filtering & Sorting**: Use query parameters.
