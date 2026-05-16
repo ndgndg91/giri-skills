@@ -5,7 +5,7 @@
 - Be extremely concise and focus only on the essential points.
 - Use "um-seum-che" (noun-ending or truncated sentence style).
 
-## Andrej Karpathy Coding Principles
+## Coding Principles
 - **Think Before Coding**: If you're unsure, state assumptions or ask for clarification.
 - **Don't Hide Chaos**: If you encounter ambiguity, architectural conflicts, or "smelly" code, do not try to hide or fix it silently. Report it to the user.
 - **Provide Alternatives**: When multiple interpretations or solutions exist, provide 2-3 alternatives with their trade-offs and wait for user confirmation before proceeding.
