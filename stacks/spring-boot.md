@@ -7,23 +7,21 @@
 
 ## 2. API Gateway Strategy
 - **Standard**: **Spring Cloud Gateway MVC** with **Virtual Threads**.
-- **Alternative**: **Spring Cloud Gateway (Reactive)** for extreme high-concurrency streaming.
 
 ## 3. Web Server (WAS) Selection
-- **Standard**: **Tomcat**. Best stability and integration with Virtual Threads.
-- **High Performance**: **Undertow**. 
-  - **Caution**: The default worker task queue is **unbounded**, which can lead to **OOM** under high load.
-  - **Best Practice**: Must apply **`RequestLimitingHandler`** via `WebServerFactoryCustomizer` to explicitly limit concurrent requests and queue size.
-- **Modular**: **Jetty**. High flexibility for custom HTTP needs.
+- **Standard**: **Tomcat**. Full support for Virtual Threads.
+- **Performance**: **Undertow** (Require `RequestLimitingHandler` for safety).
 
 ## 4. Advanced Concurrency (Virtual Threads)
 - **Standard**: `spring.threads.virtual.enabled=true`.
-- **Precaution**: Avoid `synchronized` for long I/O. Use `ReentrantLock`.
+- **Pinning Fix (JEP 491)**: From JDK 24+, the `synchronized` keyword no longer pins virtual threads to carrier threads during blocking I/O. **Feel free to use existing libraries and synchronized blocks.**
+- **Remaining Pinning Risks**: Be cautious when calling **Native Methods (JNI)** or **Foreign Function & Memory (FFM)** APIs within virtual threads, as these can still cause pinning.
+- **Focus**: Focus on actual resource limits (DB pools, memory) rather than thread-per-request overhead.
 
 ## 5. 4-Layered Architecture & DDD
 - Strict boundaries: **Interfaces, Application, Domain, Infrastructure**.
 
-## 6. Infrastructure & Tuning
+## 6. Infrastructure & Tuning (JDK 25 Optimized)
 - **GC**: **Generational ZGC**.
 - **Memory**: `-XX:MaxRAMPercentage=70.0` (Accounting for Direct Memory).
 - **Storage**: MongoDB selection timeout, HikariCP pool tuning.
