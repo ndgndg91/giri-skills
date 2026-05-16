@@ -11,6 +11,7 @@ Personal skills and principles for AI-assisted development (JDK 25, Kotlin 2, Sp
   - `adr.md`: Architecture Decision Records.
   - `api-docs.md`: REST Docs and Contract Testing (Pact).
   - `mobile-compatibility.md`: Handling multiple app versions and Force Updates.
+  - `config-secrets.md`: Centralized Configuration and Secret Management.
 - `stacks/`:
   - `spring-boot.md`: Kotlin 2 + Spring Boot 4 + JDK 25 guide.
   - `kotlin-quality.md`: ArchUnit, Detekt, ktlint.
