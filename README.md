@@ -3,20 +3,17 @@
 Personal skills and principles for AI-assisted development (JDK 25, Kotlin 2, Spring Boot 4).
 
 ## Structure
-- `core/`:
-  - `general.md`: Core coding philosophies and response style.
-  - `efficiency.md`: Operational guidelines (Accuracy, Speed, Official Docs).
-  - `infrastructure.md`: Storage, Messaging (Kafka), JVM & Container (cgroup v2) tuning.
-  - `resilience.md`: Fault tolerance (Circuit Breaker, Bulkhead) and Lifecycle (Warm-up).
-  - `observability.md`: Monitoring (Datadog, Actuator) and Logging.
+- `core/`: `general.md`, `efficiency.md`, `infrastructure.md`, `resilience.md`, `observability.md`.
 - `patterns/`:
-  - `ddd.md`: Domain-Driven Design principles.
-  - `api-design.md`: REST API standards (Kebab-case, Cursor-paging, TraceId).
-  - `security.md`: Auth (JWT, RBAC/ABAC) and Data protection.
-  - `project-structure.md`: Module strategy (Single vs Multi-module).
-  - `cicd.md`: CI/CD pipelines, GitOps (ArgoCD), and EKS deployment strategies.
+  - `ddd.md`, `api-design.md`, `security.md`, `project-structure.md`, `cicd.md`.
+  - `db-management.md`: No-downtime DB strategies (Flyway, Expand-Contract).
+  - `deployment-strategy.md`: Serialization compatibility and Rollback.
+  - `adr.md`: Architecture Decision Records.
+  - `api-docs.md`: REST Docs and Contract Testing (Pact).
 - `stacks/`:
-  - `spring-boot.md`: Detailed Kotlin 2 + Spring Boot 4 + JDK 25 guide.
+  - `spring-boot.md`: Kotlin 2 + Spring Boot 4 + JDK 25 guide.
+  - `kotlin-quality.md`: ArchUnit, Detekt, ktlint.
+  - `frontend.md`: Web (React) and Mobile (Compose Multiplatform/RN) strategies.
 
 ## Usage
-Reference these files in your AI tool configurations to maintain a consistent persona and high engineering standards.
+Reference these files in your AI tool configurations to maintain high engineering standards.
