@@ -6,36 +6,41 @@
 - **NewSQL**: Strong consistency + Horizontal scalability.
 - **Redis**: Caching, Distributed Locks (Redisson), Session, Rate Limiting.
 
-## 2. JVM & Container Runtime (EKS/cgroup v2)
-### 2.1. Container Support & Memory Tuning
-- **cgroup v2 Compatibility**: Use Java 17+ for proper resource detection.
-- **Heap vs. Native Memory**:
-  - Use **`-XX:MaxRAMPercentage=70.0`** (instead of 75.0) for heavy Kafka/NIO workloads to leave enough space for **Direct Memory** and **OS Page Cache**.
-  - **Zero-copy Optimization**: Kafka leverages zero-copy via Java NIO. Explicitly monitor and tune **`-XX:MaxDirectMemorySize`** if OOM occurs despite sufficient Heap.
-- **OOM Handling**: Use `-XX:+ExitOnOutOfMemoryError` to ensure fast recovery via Kubernetes restarts.
+## 2. Advanced Scalability Strategies
 
-### 2.2. Garbage Collection (GC) Strategy
-- **Generational ZGC (Java 21+)**: Best for low-latency and high-throughput balance on modern LTS versions.
+### 2.1. RDB Table Partitioning
+- **When to use**: When a table grows too large (e.g., hundreds of millions of rows) causing performance degradation in indexing and vacuuming.
+- **Range Partitioning**: Best for time-series data (e.g., `orders_2024_05`). Enables **partition pruning** for queries and easy archival (dropping old partitions).
+- **Hash/List Partitioning**: Use when data doesn't have a clear range but needs to be distributed across physical files for I/O performance.
 
-## 3. Apache Kafka Guide (Producer & Consumer)
-### 3.1. Producer Configuration
-- **Idempotent Producer**: `enable.idempotence=true`, `acks=all`.
-- **Ordering**: `max.in.flight.requests.per.connection <= 5`.
+### 2.2. NoSQL Sharding (MongoDB Focus)
+- **Shard Key Selection**: The most critical decision for horizontal scaling.
+  - **High Cardinality**: Choose a key with many unique values to allow fine-grained distribution.
+  - **Even Distribution**: Avoid monotonically increasing keys (like plain timestamps) for high-write workloads to prevent **Hot Shards**.
+  - **Query Pattern Alignment**: Include the shard key in frequent queries to avoid "broadcast" (scatter-gather) queries across all shards.
+- **Hashed Sharding**: Use when you need perfectly even distribution and don't require range queries on the shard key.
 
-### 3.2. Consumer Configuration
-- **Auto Commit**: Disable (`enable.auto.commit=false`). Use manual `AckMode.MANUAL_IMMEDIATE`.
-- **Memory Awareness**: Be aware that consumers use **Direct Memory** for buffer management during high-throughput message consumption.
-- **Idempotency**: Consumers MUST be idempotent using business keys.
+## 3. JVM & Container Runtime (EKS/cgroup v2)
+### 3.1. Container Support & Memory Tuning
+- **Heap vs. Native Memory**: Use `-XX:MaxRAMPercentage=70.0` to leave space for Direct Memory (Kafka Zero-copy) and OS cache.
+- **OOM Handling**: Use `-XX:+ExitOnOutOfMemoryError`.
 
-## 4. Consistency & Reliability Patterns
+### 3.2. Garbage Collection (GC) Strategy
+- **Generational ZGC (Java 21+)**: Standard for modern low-latency LTS services.
+
+## 4. Apache Kafka Guide (Producer & Consumer)
+- **Producer**: `enable.idempotence=true`, `acks=all`.
+- **Consumer**: Manual commit (`enable.auto.commit=false`), Idempotent processing.
+
+## 5. Consistency & Reliability Patterns
 - **Transactional Outbox Pattern**: Guarantee atomicity between DB and Kafka.
 - **Idempotency**: Design for At-Least-Once delivery.
 - **Circuit Breaker**: Use Resilience4j for external calls.
 
-## 5. Storage-Specific Tuning
+## 6. Storage-Specific Tuning
 - **MongoDB**: Set `serverSelectionTimeout`, tune connection pools.
 - **RDB**: Tune HikariCP (`maximum-pool-size`, `max-lifetime`).
 
-## 6. Connectivity & Security
+## 7. Connectivity & Security
 - **Timeouts**: Mandatory `Connect` and `Read` timeouts.
-- **IAM**: Use IAM roles/Service Accounts (IRSA in EKS).
+- **IAM**: Use IRSA in EKS; avoid hardcoding credentials.
