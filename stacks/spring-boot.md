@@ -6,30 +6,28 @@
 - **Spring Boot**: **Spring Boot 4.x (LTS)**.
 
 ## 2. Web Server (WAS) Selection
-- **Standard**: **Tomcat**. Most mature and has excellent integration with Virtual Threads in Spring Boot 4.
-- **High Performance**: **Undertow**. Recommended for scenarios requiring minimal memory footprint and maximum raw throughput.
-- **Reactive**: **Netty**. Use only when adopting the Spring WebFlux (Reactive) paradigm.
+- **Standard**: **Tomcat**. Highest maturity and standard for Enterprise. Excellent integration with Virtual Threads.
+- **High Performance / Low Footprint**: **Undertow**. Best for high throughput with minimal memory usage.
+- **Modular & Flexible**: **Jetty**. 
+  - **Why**: Lightweight and highly customizable. Ideal for embedded environments or when specific HTTP/2, HTTP/3 features and flexible connector configurations are needed. Used extensively by Google and Eclipse ecosystem.
+- **Reactive**: **Netty**. Strictly for Spring WebFlux scenarios.
 
 ## 3. Advanced Concurrency (Virtual Threads)
 - **Standard**: `spring.threads.virtual.enabled=true`.
-- **Thread Pinning Caution**: Avoid using `synchronized` blocks for long-running I/O or blocking operations. Use `ReentrantLock` to prevent virtual threads from pinning to carrier threads.
-- **Thread Pool Tuning**: With Virtual Threads, traditional worker thread pool (`max-threads`) tuning is secondary. Focus on resource constraints (DB connections, memory) instead.
+- **Thread Pinning Caution**: Avoid `synchronized` for long I/O. Use `ReentrantLock` to prevent pinning virtual threads to carrier threads.
+- **Resource Focus**: Move away from thread pool size tuning; focus on DB pool and Memory constraints.
 
 ## 4. 4-Layered Architecture & DDD
-- Maintain strict boundaries between **Interfaces, Application, Domain, and Infrastructure**.
+- **Interfaces, Application, Domain, Infrastructure** boundaries must be enforced.
 
 ## 5. Infrastructure Tuning (JDK 25 Optimized)
-- **GC**: **Generational ZGC** for low-latency.
-- **Memory**: `-XX:MaxRAMPercentage=70.0` to accommodate Direct Memory (Kafka/NIO).
+- **GC**: **Generational ZGC**.
+- **Memory**: `-XX:MaxRAMPercentage=70.0` (Accounting for Direct Memory).
 - **MongoDB**: `serverSelectionTimeout` tuning.
-- **HTTP Clients**: Mandatory Connect/Read timeout and connection pooling.
+- **HTTP Clients**: Mandatory Connect/Read timeout & Connection Pooling.
 
 ## 6. Implementation Standards (Kotlin 2)
-- **K2 Compiler**: Improved smart casts and compilation speed.
-- **Serialization**: `kotlinx-serialization` for high performance.
-- **Validation**: Bean Validation with Kotlin field targets.
+- **K2 Compiler** features, **kotlinx-serialization**, and idiomatic Kotlin scope functions.
 
 ## 7. Testing & Quality
-- **JUnit 5 & MockK**.
-- **Testcontainers**: Mandatory for all infrastructure-related integration tests.
-- **ArchUnit**: Enforce architectural constraints through code.
+- **JUnit 5 & MockK**, **Testcontainers**, **ArchUnit**.
