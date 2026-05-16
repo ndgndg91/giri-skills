@@ -1,0 +1,18 @@
+# IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+gen/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temp files
+tmp/
+temp/
