@@ -1,29 +1,28 @@
 # CI/CD & Deployment Guide (EKS Focus)
 
-## 1. Containerization Strategy
-- **Build Tool**: Use **Cloud Native Buildpacks (CNB)** via Spring Boot's `bootBuildImage` or a **Multi-stage Dockerfile**.
-- **Base Image**: Use **Distroless** (e.g., `gcr.io/distroless/java25`) or **Alpine** for the final runtime image to minimize attack surface and image size.
-- **Layer Optimization**: Order Dockerfile commands from least to most frequently changed to maximize layer caching.
+## 1. Infrastructure as Code (Terraform)
+- **Standard**: Use **Terraform** to manage EKS clusters, VPCs, IAM roles, and all cloud resources.
+- **State Management**: Use **Remote State** (e.g., S3 + DynamoDB for locking) to enable team collaboration and prevent state corruption.
+- **Modularization**: Create reusable Terraform modules for consistent infrastructure patterns across different environments.
+- **Security**: Apply the **Principle of Least Privilege** in IAM roles using Terraform. Use **TFLint** and **Checkov** for static analysis.
 
-## 2. CI Pipeline (GitHub Actions)
-- **Quality Gates**: Every PR must pass:
-  - Unit & Integration tests (including Testcontainers).
-  - Static analysis (e.g., SonarQube, ArchUnit).
-  - Vulnerability scanning (e.g., Trivy, Snyk) for dependencies and images.
-- **Registry**: Push images to **Amazon ECR** with immutable tags (e.g., `sha-{git-commit-hash}`).
+## 2. Containerization Strategy
+- **Build Tool**: Use **Cloud Native Buildpacks (CNB)** or **Multi-stage Dockerfiles**.
+- **Base Image**: Use **Distroless** (e.g., `gcr.io/distroless/java25`) for security and minimal footprint.
 
-## 3. CD & GitOps (ArgoCD)
-- **Deployment Pattern**: Use **GitOps** with **ArgoCD**. The infrastructure state (Helm charts or K8s manifests) should be managed in a separate "git-ops" repository.
-- **Configuration Management**: Use **Helm** to manage environment-specific configurations (Dev, Staging, Prod).
-- **Secrets**: Never store secrets in Git. Use **AWS Secrets Manager** or **HashiCorp Vault** integrated via **External Secrets Operator**.
+## 3. CI Pipeline (GitHub Actions)
+- **Workflow**: Automated testing, linting, and security scanning on every PR.
+- **Image Push**: Build and push immutable images to **Amazon ECR** with Git SHA tags.
 
-## 4. Deployment Strategies
-- **Zero-Downtime**: Always use **Rolling Updates** at a minimum.
-- **Advanced Strategies**:
-  - **Canary**: Shift a small percentage of traffic to the new version and monitor metrics (via Datadog) before full rollout.
-  - **Blue-Green**: Switch traffic between two identical environments for instant rollback capability.
-- **Rollback**: Automate rollbacks based on error rate or latency spikes detected during Canary/Rolling updates.
+## 4. CD & GitOps (ArgoCD & Helm)
+- **Packaging**: Use **Helm** for application packaging.
+  - Maintain a base Helm chart and use `values.yaml` for environment-specific configurations.
+- **GitOps**: Use **ArgoCD** to synchronize the EKS cluster state with the Helm charts stored in the "git-ops" repository.
+- **Secrets Management**: Integrate **AWS Secrets Manager** with Kubernetes via **External Secrets Operator (ESO)**.
 
-## 5. EKS Integration
-- **IRSA (IAM Roles for Service Accounts)**: Use IRSA to grant the Pods only the necessary AWS permissions.
-- **Resource Limits**: Define precise CPU/Memory requests and limits based on performance testing to enable effective HPA (Horizontal Pod Autoscaler) and KEDA.
+## 5. Deployment & Stability
+- **Strategies**: Implement **Canary** or **Blue-Green** deployments for high-risk changes.
+- **EKS Optimization**: 
+  - Use **IRSA** for fine-grained IAM permissions for Pods.
+  - Configure **HPA/KEDA** based on metrics from Datadog or Prometheus.
+  - Implement **Graceful Shutdown** and **Warm-up** logic (as defined in the Resilience guide).
