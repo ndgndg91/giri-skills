@@ -6,32 +6,36 @@
 - **Domain**: Pure business logic (Entities, VOs, Domain Services). No dependency on frameworks or infrastructure.
 - **Infrastructure**: Technical implementations (JPA, Redis, External Clients).
 
-## 2. JPA Entity vs Domain Entity Strategy
+## 2. Modern Runtime (Virtual Threads)
+- **Standard**: Enable **Virtual Threads** (`spring.threads.virtual.enabled=true`) for applications running on Java 21+.
+- **Benefits**: Simplifies concurrency by allowing a blocking-style programming model while maintaining high scalability.
+- **Precaution**: Avoid long-running synchronized blocks to prevent thread pinning. Use `ReentrantLock` if necessary.
+
+## 3. Infrastructure Tuning
+
+### 3.1. Connection Pools (HikariCP)
+- Always tune `maximum-pool-size`, `connection-timeout`, and `max-lifetime` based on production load.
+
+### 3.2. MongoDB (Spring Data Mongo)
+- **Server Selection**: Explicitly configure `serverSelectionTimeout` to prevent long waits during cluster failover.
+- **Connection Pool**: Monitor and tune `max-connection-pool-size` and `min-connection-pool-size`.
+
+### 3.3. HTTP Clients (RestClient, WebClient, Feign)
+- **Timeouts**: Mandatory configuration of `Connect Timeout` and `Read Timeout`.
+- **Connection Pooling**: Use pooled connection managers (e.g., Apache HttpClient or Jetty Client) to reuse connections and avoid socket exhaustion.
+
+## 4. JPA Entity vs Domain Entity Strategy
 ### Basic Principle: Pragmatic Unified Model
-- By default, use **JPA Entity as Domain Entity** for productivity.
-- Use Kotlin's `all-open` plugin to support JPA proxying.
+- By default, use **JPA Entity as Domain Entity**. Use Kotlin's `all-open` plugin.
 
 ### When to Separate
-- **Schema Mismatch**: DB structure differs significantly from the domain model.
-- **Domain Pollution**: Persistence concerns overwhelm business logic.
-- **Multiple Data Sources**: Data combined from multiple sources (DB, APIs).
+- **Schema Mismatch**, **Domain Pollution**, or **Multiple Data Sources**.
 
-## 3. Distributed Lock Strategy (Redis/Redisson)
-- **AOP-First**: Use custom annotations (e.g., `@DistributedLock`) for standard cases to maintain clean business logic.
-- **Programmatic Fallback**: Use `RedissonClient` or a `LockTemplate` when keys are dynamic/complex or when multiple locks require fine-grained orchestration.
-- **Transaction Rule**: Acquire the lock **before** starting a transaction and release it **after** the transaction commits to ensure data consistency across threads.
-
-## 4. Caching Strategy (Redis & Caffeine)
-- **Abstraction-First**: Use Spring Cache (`@Cacheable`, `@CacheEvict`) for simple Look-aside patterns.
-- **Manual Control**: Use `RedisTemplate` or specialized `CacheRepository` for complex TTL management, bulk operations, or data-specific serialization needs.
-- **Pattern**: Prefer **Cache-Aside** for reads. Evict or update cache on writes.
-
-## 5. Implementation Standards (Kotlin)
-- **No Lombok**: Use native Kotlin features (data classes, named arguments).
-- **Constructor Injection**: Preferred over field injection.
-- **Validation**: Use Bean Validation with Kotlin field targets (`@field:NotBlank`).
+## 5. Distributed Lock & Cache
+- **Distributed Lock**: AOP-First with Redisson. Ensure lock acquisition happens outside the transaction.
+- **Cache**: Spring Cache for simple cases, `RedisTemplate` for complex logic. Use **Cache-Aside** pattern.
 
 ## 6. Testing Strategy
-- **JUnit 5 & MockK**: Standard for unit testing.
-- **Testcontainers**: Use for integration tests to ensure compatibility with real DB/Redis environments.
-- **Slice Testing**: `@WebMvcTest`, `@DataJpaTest` with Testcontainers for focused verification.
+- **JUnit 5 & MockK** for unit tests.
+- **Testcontainers** for integration tests (DB, Redis, Mongo, Kafka).
+- **Slice Testing**: `@WebMvcTest`, `@DataJpaTest`, `@DataMongoTest`.
