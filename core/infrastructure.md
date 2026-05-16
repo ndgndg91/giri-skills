@@ -7,24 +7,24 @@
 - **Redis**: Caching, Distributed Locks (Redisson), Session, Rate Limiting.
 
 ## 2. JVM & Container Runtime (EKS/cgroup v2)
-### 2.1. Container Support & Memory
-- **cgroup v2 Compatibility**: Use Java 17+ (or 11.0.16+) for proper cgroup v2 resource detection. Ensure `-XX:+UseContainerSupport` is enabled (default in modern JVMs).
-- **Memory Settings**: Avoid fixed `-Xmx`. Use percentage-based settings to adapt to container limits:
-  - `-XX:MaxRAMPercentage=75.0` (Allow some overhead for metaspace, threads, and OS).
-  - `-XX:InitialRAMPercentage=75.0` (To avoid heap resizing overhead).
-- **OOM Handling**: Use `-XX:+ExitOnOutOfMemoryError` or `-XX:+CrashOnOutOfMemoryError` to let Kubernetes restart the Pod immediately on OOM.
+### 2.1. Container Support & Memory Tuning
+- **cgroup v2 Compatibility**: Use Java 17+ for proper resource detection.
+- **Heap vs. Native Memory**:
+  - Use **`-XX:MaxRAMPercentage=70.0`** (instead of 75.0) for heavy Kafka/NIO workloads to leave enough space for **Direct Memory** and **OS Page Cache**.
+  - **Zero-copy Optimization**: Kafka leverages zero-copy via Java NIO. Explicitly monitor and tune **`-XX:MaxDirectMemorySize`** if OOM occurs despite sufficient Heap.
+- **OOM Handling**: Use `-XX:+ExitOnOutOfMemoryError` to ensure fast recovery via Kubernetes restarts.
 
 ### 2.2. Garbage Collection (GC) Strategy
-- **G1GC**: Default for most applications. Good balance between throughput and latency.
-- **ZGC (Java 17+)**: Use for low-latency requirements (sub-millisecond pauses).
-- **Generational ZGC (Java 21+)**: Significantly improved throughput and memory efficiency over standard ZGC.
+- **Generational ZGC (Java 21+)**: Best for low-latency and high-throughput balance on modern LTS versions.
 
 ## 3. Apache Kafka Guide (Producer & Consumer)
 ### 3.1. Producer Configuration
 - **Idempotent Producer**: `enable.idempotence=true`, `acks=all`.
 - **Ordering**: `max.in.flight.requests.per.connection <= 5`.
+
 ### 3.2. Consumer Configuration
 - **Auto Commit**: Disable (`enable.auto.commit=false`). Use manual `AckMode.MANUAL_IMMEDIATE`.
+- **Memory Awareness**: Be aware that consumers use **Direct Memory** for buffer management during high-throughput message consumption.
 - **Idempotency**: Consumers MUST be idempotent using business keys.
 
 ## 4. Consistency & Reliability Patterns
