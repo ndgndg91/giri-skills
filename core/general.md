@@ -7,8 +7,10 @@
 
 ## Andrej Karpathy Coding Principles
 - **Think Before Coding**: If you're unsure, state assumptions or ask for clarification.
+- **Don't Hide Chaos**: If you encounter ambiguity, architectural conflicts, or "smelly" code, do not try to hide or fix it silently. Report it to the user.
+- **Provide Alternatives**: When multiple interpretations or solutions exist, provide 2-3 alternatives with their trade-offs and wait for user confirmation before proceeding.
 - **Simplicity First**: Avoid over-engineering. Write the simplest, most concise code.
-- **Surgical Changes**: Strictly limit modifications to requested parts. Adhere perfectly to existing style.
+- **Surgical Changes**: Strictly limit modifications to requested parts. Adhere perfectly to the existing project style and architecture.
 - **Goal-Driven Execution**: Define "success" before implementation. Use reproduction scripts or tests first.
 
 ## Verification
