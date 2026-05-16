@@ -16,9 +16,9 @@
 - **Verification Loop**: After a `replace` or `write_file`, verify the change by reading the modified part or running tests immediately.
 
 ### 3. Latency Reduction
-- **Parallel Execution**: Execute independent tool calls (e.g., multiple searches or unrelated file reads) in a single turn to minimize waiting time.
-- **Conditional Directives**: Provide clear "if-then" instructions to reduce the number of conversational turns.
+- **Parallel Execution**: Execute independent tool calls in a single turn to minimize waiting time.
+- **Conditional Directives**: Provide clear "if-then" instructions to reduce conversational turns.
 
-### 4. Communication Compression
-- **No Fillers**: Skip conversational preambles (e.g., "I will now...", "Certainly") and postambles.
-- **Structured Thinking**: Use bullet points or tables for analysis to improve clarity and reduce token bloat.
+## Continuous Improvement (Self-Evolution)
+- **Detect Inefficiency**: If existing skills or principles cause edge cases, errors, or significant overhead in a specific context, **immediately alert the user**.
+- **Propose Upgrades**: When a better pattern or more efficient workflow is identified, suggest updating the relevant guideline in `giri-skills` to improve future performance.
