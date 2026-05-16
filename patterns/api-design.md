@@ -13,16 +13,15 @@
 - **Performance**: Avoid Offset-based pagination for large datasets.
 
 ## 4. Response & Error Formats (Envelope Pattern)
-All API responses must follow a consistent envelope structure containing a **traceId** for distributed tracing and observability.
+All API responses must follow a consistent envelope structure containing a **traceId** for observability.
 
-### 4.1 Distributed Tracing (`meta.traceId`)
-- **`traceId`**: A unique identifier for the entire transaction across services.
-  - **Header Priority**:
-    1. `traceparent` (W3C Trace Context standard)
-    2. `X-Trace-Id` or `X-Request-Id` (legacy headers)
-  - **Fallback**: If no header is provided, the entry-point service must generate a random UUID as the `traceId`.
-  - **Propagation**: This ID must be propagated to all downstream internal calls and messaging headers (Kafka, etc.).
-- **`timestamp`**: Server-side processing completion time in milliseconds (Unix timestamp).
+### 4.1 Distributed Tracing (`meta.traceId`) & Headers
+- **Modern Header Naming (RFC 6648)**: **Avoid using the `X-` prefix** for custom headers as it is deprecated. Use direct, descriptive names instead.
+- **Header Priority**:
+  1. `traceparent` (W3C Trace Context standard)
+  2. `Trace-Id` or `Request-Id` (instead of `X-Trace-Id`)
+- **Propagation**: This ID must be propagated across all service boundaries.
+- **`timestamp`**: Server-side processing completion time in milliseconds.
 
 ### 4.2 Success Response Format
 ```json
