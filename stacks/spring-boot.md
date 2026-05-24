@@ -37,3 +37,5 @@
   - Do **NOT** use Korean in test function names (Avoid backtick names in Korean to prevent CI/CD and static analysis compatibility issues).
   - Test function names must be written in English using `should_snake_case` (e.g., `should_do_something_when_condition`).
   - Use **`@DisplayName("한글 설명")`** to express test scenarios in Korean for executable specifications.
+  - Write BDD scenario comments in lowercase: `// given`, `// when`, `// then`.
+
