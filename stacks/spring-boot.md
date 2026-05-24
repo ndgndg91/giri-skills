@@ -33,3 +33,7 @@
 
 ## 8. Testing & Quality
 - **JUnit 5 & Mockito & AssertJ (BDD Style)**, **Testcontainers**, **ArchUnit**.
+- **Test Naming Convention**:
+  - Do **NOT** use Korean in test function names (Avoid backtick names in Korean to prevent CI/CD and static analysis compatibility issues).
+  - Test function names must be written in English (e.g., `camelCase` or `snake_case`).
+  - Use **`@DisplayName("한글 설명")`** to express test scenarios in Korean for executable specifications.
