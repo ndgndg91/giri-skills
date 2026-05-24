@@ -32,4 +32,4 @@
 - **K2 Compiler**, **kotlinx-serialization**, idiomatic scope functions.
 
 ## 8. Testing & Quality
-- **JUnit 5 & MockK**, **Testcontainers**, **ArchUnit**.
+- **JUnit 5 & Mockito & AssertJ (BDD Style)**, **Testcontainers**, **ArchUnit**.
