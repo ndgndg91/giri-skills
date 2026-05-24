@@ -39,3 +39,12 @@
   - Use **`@DisplayName("한글 설명")`** to express test scenarios in Korean for executable specifications.
   - Write BDD scenario comments in lowercase: `// given`, `// when`, `// then`.
 
+## 9. Financial Precision & Money Types (BigDecimal & Scale Factor)
+- **Anti-Pattern**: Do **NOT** use `Double` or `Float` for monetary amounts, interest rates, or margins due to IEEE 754 floating-point rounding errors.
+- **Standard**: Use **`BigDecimal`** and specify an explicit **`RoundingMode`** (e.g., `RoundingMode.HALF_UP` for rounding) to guarantee perfect precision in trade and financial operations.
+- **High-Performance Optimization (Scale Factor Pattern)**: Under extreme high-throughput, low-latency transaction processing where the object allocation overhead of `BigDecimal` becomes a bottleneck:
+  - Apply the **Scale Factor** pattern using primitive **`Long`** types.
+  - Scale all values by a fixed factor (e.g., multiplying by `10,000` to support up to 4 decimal places) for fast integer-based arithmetic.
+  - Convert back to the target precision only at the presentation or external API boundary.
+
+
