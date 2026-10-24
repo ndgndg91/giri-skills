@@ -10,7 +10,7 @@ Personal skills and principles for AI-assisted development (JDK 25, Kotlin 2, Sp
   - `ddd.md`, `api-design.md`, `security.md`, `project-structure.md`, `cicd.md`.
   - `db-management.md`, `deployment-strategy.md`, `adr.md`, `api-docs.md`.
   - `mobile-compatibility.md`, `config-secrets.md`, `distributed-consistency.md`.
-  - `testing-pyramid.md`, `legacy-refactoring.md`.
+  - `testing-pyramid.md`, `legacy-refactoring.md`, `frontend-taste.md`.
 - `stacks/`:
   - `spring-boot.md`, `kotlin-quality.md`, `frontend.md`.
 

@@ -2,7 +2,11 @@
 
 ## 1. Web Development
 - **Standard**: **React + TypeScript + Tailwind CSS**.
-- **Principle**: Strong typing for API responses and component props.
+- **Principles**:
+  - **Type Safety**: Strong typing for API responses and component props.
+  - **Design Taste & Anti-Slop**: Strictly follow `patterns/frontend-taste.md`. Ban generic AI slop (violet gradients, 3 identical cards, eyebrow badges, cream+terracotta tropes) and enforce substance-driven design with distinct typography, real UI fragments, and argument-based layouts.
+  - **View Separation**: Clearly distinguish public narrative pages from high-density, utility-focused app screens.
+  - **Verification**: Verify visual hierarchy and responsive behavior across viewports (Mobile 375px, Tablet 768px, Desktop 1280px+).
 
 ## 2. Mobile Development Options
 - **Compose Multiplatform (Recommended)**: 
