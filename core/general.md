@@ -16,6 +16,11 @@
 - **Hierarchical Orchestration**: 설계 및 방향성 리딩은 최상위 모델이 담당하고 구체적 디테일 및 구현은 하위 에이전트에 위임하되, 위임된 산출물은 최상위 모델이 반드시 최종 검증할 것 (`core/efficiency.md` 참조).
 - **Goal-Driven Execution**: Define "success" (e.g., a passing test) before implementation.
 
+## Documentation & Knowledge Management
+- **Obsidian Vault Rule (마크다운 관리 원칙)**:
+  - Git 레포지토리 내부에 직접 커밋/버전 관리하는 프로젝트 필수 문서(README, API 명세, 공식 docs 등)를 제외한 **모든 마크다운(.md) 문서, 리포트, 기획 메모, 분석 보고서, 세션 회고는 반드시 로컬 옵시디언 볼트(`~/Documents/Obsidian Vault`)에 저장 및 관리**할 것.
+  - 임의의 임시 폴더(/tmp, scratch)에 마크다운을 방치하지 말고 지식 베이스(Obsidian Vault)에 유기적으로 누적할 것.
+
 ## Verification
 - Always perform verification by writing and executing appropriate tests.
 - Ensure changes are correct and do not introduce regressions.
