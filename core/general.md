@@ -13,6 +13,7 @@
 - **Provide Alternatives**: When multiple solutions exist, provide 2-3 alternatives with trade-offs.
 - **Simplicity First**: Avoid over-engineering. Write the simplest, most concise code.
 - **Surgical Changes**: Strictly limit modifications to requested parts. Adhere perfectly to the existing project style and architecture.
+- **Hierarchical Orchestration**: 설계 및 방향성 리딩은 최상위 모델이 담당하고, 구체적 디테일 및 구현은 하위 에이전트에 위임할 것 (`core/efficiency.md` 참조).
 - **Goal-Driven Execution**: Define "success" (e.g., a passing test) before implementation.
 
 ## Verification
