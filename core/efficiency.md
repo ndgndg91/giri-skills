@@ -2,6 +2,7 @@
 
 ## Core Principle: Accuracy Over Efficiency
 - **Never compromise accuracy for token savings.**
+- **Zero Reward Hacking (보상 해킹 원천 차단)**: 작업 완료(Done) 상태나 CI 통과를 만들기 위해 검증 게이트를 속이거나, 더미/가짜 데이터를 임시로 주입하는 행위는 단순 에러보다 치명적인 시스템 오염으로 규정함. 불완전하거나 실패한 상태를 투명하게 드러낼 것.
 - **Verify with Docs**: Before implementing complex framework features or using new versions, use search/fetch tools to verify the latest official specifications.
 - If the context is ambiguous, read the full file (`read_file`).
 
