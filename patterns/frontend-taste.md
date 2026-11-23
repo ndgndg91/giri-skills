@@ -27,6 +27,11 @@ Strictly avoid the following repetitive generation tropes:
 | **Recent Clichés** | Yellow-cream background + terracotta/rust accents (the 2025-2026 "editorial fix" slop) | Palettes derived strictly from the subject's domain and materials |
 | **Ornaments** | Faux design-tool chrome (crosshairs `+`, crop marks, hairline grids, index numbers `01/02`) | Structure built strictly from white space and tonal boundaries |
 
+**Allowed exceptions** (decided 2026-11-23, values in `design/DESIGN.md`):
+- **Floating layers**: menus, popovers and dialogs may use one subtle shadow together with a 1px border, because they sit on top of other content. Cards and panels never get shadows.
+- **Status badges in tables and lists**: a pill background with text only (no dot) is allowed. Never place badges above titles.
+- **Monospace for real data**: IDs, hashes, code and logs use monospace. The ban covers decorative meta labels only.
+
 ---
 
 ## 3. Page vs. App Screen Separation

@@ -17,7 +17,7 @@ Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This f
 1. Load fonts with the stylesheet link printed at the top of `tokens.css` (Google Fonts).
 2. Include `tokens.css`: link it, or paste its contents into a single-file HTML page.
 3. Use only `var(--...)` tokens for color, font, spacing, radius and shadow. No raw hex, rgba or px values outside `tokens.json`.
-4. Typography: `font: var(--text-h1); letter-spacing: var(--text-h1-letter-spacing);`
+4. Typography: `font: var(--text-h1); letter-spacing: var(--text-h1-letter-spacing);` Roles: `display`, `h1`, `h2`, `body`, `small`.
 5. Theme: light by default. Dark follows `prefers-color-scheme`. `data-theme="light"` or `data-theme="dark"` on `<html>` overrides it.
 
 ## Decisions
@@ -32,8 +32,9 @@ Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This f
 
 ### Typography
 - Body: Inter (Latin and digits) with Noto Sans KR (Hangul). Mono: JetBrains Mono for code, logs and IDs.
-- Scale (px): display 36, h1 28, h2 22, h3 18, body 16, small 14, caption 13.
+- Scale, 5 sizes (px): display 36 (KPI numbers), h1 24 (page title), h2 18 (section title), body 16, small 14 (tables, buttons, inputs, labels, timestamps). Do not add sizes.
 - Numbers in tables and KPI values use `font-variant-numeric: tabular-nums`.
+- Monospace only for real data values: IDs, hashes, code, logs. Never for decorative meta labels.
 - JetBrains Mono has no Hangul, so log lines that mix Korean will not align. Accepted.
 
 ### Spacing (comfortable density)
@@ -48,13 +49,19 @@ Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This f
 - Exceptions:
   - Inputs and secondary buttons keep a `border-strong` outline.
   - Table rows keep `border` dividers.
-  - Floating layers (menus, popovers, dialogs) use `border` and `shadow-overlay`.
+  - Floating layers (menus, popovers, dialogs) use `border` and `shadow-overlay`. This is the only place a shadow is allowed.
 
-## Open conflicts with `patterns/frontend-taste.md` (decide before components)
-1. The type scale has 7 sizes. frontend-taste section 4 says 3 to 5 sizes.
-2. `shadow-overlay` is a soft blurred shadow. frontend-taste section 2 bans soft blurry drop shadows.
-3. `radius-badge` is fully rounded, and the comparison pages drew a dot inside status badges. frontend-taste section 2 bans pill badges above titles and decorative status dots. Whether status badges inside tables are allowed is not decided.
-4. The comparison pages put a small label above the page title. frontend-taste section 2 bans eyebrow labels. Templates must not copy it.
+### Badges and titles
+- Status badges (success, warning, danger) appear only inside tables and lists: pill background (`radius-badge`) with text only. No dot, no icon.
+- Never place a badge or a small label above a title. Put the context into the title itself, for example "11월 16~22일 서비스 상태".
+
+## Conflicts with `patterns/frontend-taste.md` (resolved 2026-11-23)
+| # | Conflict | Decision |
+| :--- | :--- | :--- |
+| 1 | Type scale had 7 sizes; frontend-taste section 4 allows 3 to 5 | Reduced to 5: 36 / 24 / 18 / 16 / 14 |
+| 2 | `shadow-overlay` is a soft shadow; section 2 bans soft blurry drop shadows | Allowed for floating layers only (added as an exception in frontend-taste) |
+| 3 | Pill status badges with a dot; section 2 bans pill badges above titles and status dots | Pill background kept for status in tables and lists, dot removed, no badges above titles (exception added) |
+| 4 | Comparison pages used a small label above the page title; section 2 bans eyebrow labels | No label above titles; context goes into the title. Monospace stays for real data values (exception added) |
 
 ## Not done yet
 - Components with states: button, input, select, tabs, table, badge, alert, card, menu, empty state.
