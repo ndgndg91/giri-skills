@@ -13,6 +13,8 @@ Personal skills and principles for AI-assisted development (JDK 25, Kotlin 2, Sp
   - `testing-pyramid.md`, `legacy-refactoring.md`, `frontend-taste.md`.
 - `stacks/`:
   - `spring-boot.md`, `kotlin-quality.md`, `frontend.md`.
+- `design/`:
+  - `DESIGN.md`, `tokens.json` (source), `tokens.css` (generated), `build_tokens.py`.
 
 ## Usage
 Reference these files in your AI tool configurations to maintain high engineering standards.
