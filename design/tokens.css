@@ -20,6 +20,14 @@
   --color-warning-bg: #FCEBC7;
   --color-danger-text: #B42318;
   --color-danger-bg: #FDE3DF;
+  --color-chart-1: #2B5CE6;
+  --color-chart-2: #EB6834;
+  --color-chart-3: #1BAF7A;
+  --color-chart-4: #EDA100;
+  --color-chart-5: #E87BA4;
+  --color-chart-6: #008300;
+  --color-chart-7: #6250D6;
+  --color-chart-8: #E34948;
   --shadow-overlay: 0px 4px 8px 0px #1018280F, 0px 16px 32px 0px #1018281F;
   --font-family-body: "Inter", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --font-family-mono: "JetBrains Mono", ui-monospace, monospace;
@@ -102,6 +110,14 @@
     --color-warning-bg: #2E2208;
     --color-danger-text: #FF8A80;
     --color-danger-bg: #3A1512;
+    --color-chart-1: #4F7FEA;
+    --color-chart-2: #C96A3A;
+    --color-chart-3: #1F9C83;
+    --color-chart-4: #B48A2A;
+    --color-chart-5: #C7638F;
+    --color-chart-6: #3E9A45;
+    --color-chart-7: #8C7FE0;
+    --color-chart-8: #D06464;
     --shadow-overlay: 0px 8px 16px 0px #00000073, 0px 24px 48px 0px #00000080;
   }
 }
@@ -125,5 +141,13 @@
   --color-warning-bg: #2E2208;
   --color-danger-text: #FF8A80;
   --color-danger-bg: #3A1512;
+  --color-chart-1: #4F7FEA;
+  --color-chart-2: #C96A3A;
+  --color-chart-3: #1F9C83;
+  --color-chart-4: #B48A2A;
+  --color-chart-5: #C7638F;
+  --color-chart-6: #3E9A45;
+  --color-chart-7: #8C7FE0;
+  --color-chart-8: #D06464;
   --shadow-overlay: 0px 8px 16px 0px #00000073, 0px 24px 48px 0px #00000080;
 }

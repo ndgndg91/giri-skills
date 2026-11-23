@@ -2,7 +2,7 @@
 
 Goal: Claude Code, Codex, Antigravity (agy) and Grok Build produce the same-looking UI from the same request.
 
-Status (2026-11-23): **foundation tokens decided** (color, type, spacing, radius, surfaces). Components, page templates, decision tables and the verification script are not written yet.
+Status (2026-11-23): **foundation tokens decided** (color, chart colors, type, spacing, radius, surfaces). Components, page templates, decision tables and the verification script are not written yet.
 
 Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This folder fixes the concrete values.
 
@@ -50,6 +50,17 @@ Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This f
   - Inputs and secondary buttons keep a `border-strong` outline.
   - Table rows keep `border` dividers.
   - Floating layers (menus, popovers, dialogs) use `border` and `shadow-overlay`. This is the only place a shadow is allowed.
+
+### Charts
+- Categorical palette, 8 slots in fixed order: 1 cobalt, 2 orange, 3 aqua, 4 yellow, 5 pink, 6 green, 7 violet, 8 red (`--color-chart-1` to `--color-chart-8`). Light mode uses the vivid steps, dark mode the muted steps of the same hues.
+- One series: slot 1 only, no legend (the title says what is plotted).
+- Two or more series: assign from slot 1 in order. Never skip or cycle. The same entity keeps the same slot in every chart on the page, and a filter never repaints the remaining series.
+- More than 8 series: fold the rest into "기타". Scatter, bubble and map charts: at most 3 series.
+- Every chart ships a table view (for example `<details>표로 보기</details>`). Light slots 3 to 5 are below 3:1 on white, so the table is required, not optional.
+- Legend for two or more series. Text (values, names, axes) uses text tokens, never a series color.
+- Status meaning (good, warning, error) uses the status colors, never chart colors, and the two are never mixed in one chart.
+- Marks: bars at most 24px thick with a 4px rounded end and a square baseline; lines 2px; end dots at least 8px with a 2px surface ring; 2px surface gap between stacked segments; 1px solid gridlines in `border`.
+- Validation (dataviz `validate_palette.js`, 2026-11-23): light on `#FFFFFF` worst adjacent CVD 9.1, normal vision 19.6, slots 3 to 5 below 3:1 (2.82, 2.17, 2.69). Dark on `#111A2B` worst adjacent CVD 8.5, normal vision 16.8, all at least 3:1. First 3 slots pass all-pairs in both modes; 4 slots fail.
 
 ### Badges and titles
 - Status badges (success, warning, danger) appear only inside tables and lists: pill background (`radius-badge`) with text only. No dot, no icon.
