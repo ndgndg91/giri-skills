@@ -2,7 +2,7 @@
 
 Goal: Claude Code, Codex, Antigravity (agy) and Grok Build produce the same-looking UI from the same request.
 
-Status (2026-11-23): **foundations decided** (color, chart colors, type, spacing, radius, surfaces, icons, number and date formats). Components, page templates, decision tables and the verification script are not written yet.
+Status (2026-11-23): **foundations and components decided** (color, chart colors, type, spacing, radius, surfaces, icons, number and date formats, components). Page templates, decision tables and the verification script are not written yet.
 
 Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This folder fixes the concrete values.
 
@@ -12,11 +12,14 @@ Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This f
 | `tokens.json` | Source of truth (W3C Design Tokens format). Edit only this file. |
 | `tokens.css` | CSS variables generated from `tokens.json`. Do not edit by hand. |
 | `build_tokens.py` | `python3 design/build_tokens.py` regenerates `tokens.css`. `--check` exits 1 if it is stale. Standard library only. |
+| `components.css` | Component classes built only from tokens. Requires `tokens.css`. |
+| `examples/components.html` | Every component with real markup. Copy markup from here. |
+| `icons/` | The 17 allowed icons (Lucide subset) and their license. |
 
 ## Using the tokens
 1. Load fonts with the stylesheet link printed at the top of `tokens.css` (Google Fonts).
-2. Include `tokens.css`: link it, or paste its contents into a single-file HTML page.
-3. Use only `var(--...)` tokens for color, font, spacing, radius and shadow. No raw hex, rgba or px values outside `tokens.json`.
+2. Include `tokens.css`, then `components.css`: link them, or paste their contents into a single-file HTML page. Put `class="ds"` on `<body>`.
+3. Build UI from the component classes. Color, font, spacing, radius and shadow come only from `var(--...)` tokens. Raw hex, rgba and spacing px appear only in `tokens.json` and `components.css`; page CSS may use px only for layout widths (for example `max-width`).
 4. Typography: `font: var(--text-h1); letter-spacing: var(--text-h1-letter-spacing);` Roles: `display`, `h1`, `h2`, `body`, `small`.
 5. Theme: light by default. Dark follows `prefers-color-scheme`. `data-theme="light"` or `data-theme="dark"` on `<html>` overrides it.
 
@@ -107,6 +110,24 @@ Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This f
 - Status badges (success, warning, danger) appear only inside tables and lists: pill background (`radius-badge`) with text only. No dot, no icon.
 - Never place a badge or a small label above a title. Put the context into the title itself, for example "11월 16~22일 서비스 상태".
 
+## Components (`components.css`)
+Markup for every class is in `examples/components.html`. One way per job: do not add variants.
+
+| Component | Classes | Rules |
+| :--- | :--- | :--- |
+| Button | `.btn` + `.btn-primary` / `.btn-secondary` / `.btn-ghost` / `.btn-danger`, `.btn-icon` | One primary per screen. Icon before label. Icon-only needs `aria-label`. Busy: `aria-busy="true"` + `.spinner` + "~하는 중". `.btn-danger` only as the final button of a delete dialog |
+| Form | `.field`, `.field-label`, `.input`, `.input-wrap`, `.select`, `.field-help`, `.field-error`, `.check` | Label above, help or error below. Error: `aria-invalid="true"` + `aria-describedby`. Checkbox and radio are native inputs in `.check`. No toggle switch |
+| Tabs | `.tabs` > `.tab[role=tab][aria-selected]` | Pill style only |
+| Table | `.table-wrap` > `.table`, `.num`, `.sort`, `tr.is-selected`, `.cell-action`, `.pager` | Numbers in `.num`. Sortable header: `<button class="sort">` + `aria-sort` |
+| Stat | `.stat`, `.stat-label`, `.stat-value`, `.stat-unit`, `.stat-delta` | Full number, signed delta in `text-muted` |
+| Badge | `.badge` + `.badge-success` / `.badge-warning` / `.badge-danger` / `.badge-neutral` | Tables and lists only. Text only |
+| Alert | `.alert` + `.alert-info` / `.alert-success` / `.alert-warning` / `.alert-danger`, `.alert-body`, `.alert-title` | Icon (20px) + title + one sentence |
+| Empty state | `.empty` (inside `.card`) | Title, one sentence, one next action. No illustration |
+| Loading | `.skeleton`, `.is-refreshing`, `.spinner` | First load: static `.skeleton` blocks shaped like the content. Reload: `.is-refreshing` on the existing content. `.spinner` only inside busy buttons |
+| Menu | `.menu` > `.menu-item`, `.menu-check`, `.menu-item-danger`, `hr.menu-sep` | Destructive entry point is a `.menu-item-danger`, which opens the confirm dialog |
+| Dialog | `.scrim` > `.dialog`, `.dialog-head`, `.dialog-foot` | Footer right-aligned: secondary, then primary or danger. Scrim uses `color-scrim` |
+| Card | `.card` | Background only, no border or shadow |
+
 ## Conflicts with `patterns/frontend-taste.md` (resolved 2026-11-23)
 | # | Conflict | Decision |
 | :--- | :--- | :--- |
@@ -116,7 +137,6 @@ Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This f
 | 4 | Comparison pages used a small label above the page title; section 2 bans eyebrow labels | No label above titles; context goes into the title. Monospace stays for real data values (exception added) |
 
 ## Not done yet
-- Components with states: button, input, select, tabs, table, badge, alert, card, menu, empty state.
 - Page templates: report, dashboard, form.
 - Decision table (which component when) and banned list for agents.
 - Verification script: raw values, unknown classes, contrast.

@@ -28,6 +28,7 @@
   --color-chart-6: #008300;
   --color-chart-7: #6250D6;
   --color-chart-8: #E34948;
+  --color-scrim: #10182873;
   --shadow-overlay: 0px 4px 8px 0px #1018280F, 0px 16px 32px 0px #1018281F;
   --font-family-body: "Inter", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --font-family-mono: "JetBrains Mono", ui-monospace, monospace;
@@ -120,6 +121,7 @@
     --color-chart-6: #3E9A45;
     --color-chart-7: #8C7FE0;
     --color-chart-8: #D06464;
+    --color-scrim: #000000A3;
     --shadow-overlay: 0px 8px 16px 0px #00000073, 0px 24px 48px 0px #00000080;
   }
 }
@@ -151,5 +153,6 @@
   --color-chart-6: #3E9A45;
   --color-chart-7: #8C7FE0;
   --color-chart-8: #D06464;
+  --color-scrim: #000000A3;
   --shadow-overlay: 0px 8px 16px 0px #00000073, 0px 24px 48px 0px #00000080;
 }
