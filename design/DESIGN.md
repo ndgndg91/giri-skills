@@ -2,7 +2,7 @@
 
 Goal: Claude Code, Codex, Antigravity (agy) and Grok Build produce the same-looking UI from the same request.
 
-Status (2026-11-23): **foundation tokens decided** (color, chart colors, type, spacing, radius, surfaces). Components, page templates, decision tables and the verification script are not written yet.
+Status (2026-11-23): **foundations decided** (color, chart colors, type, spacing, radius, surfaces, icons, number and date formats). Components, page templates, decision tables and the verification script are not written yet.
 
 Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This folder fixes the concrete values.
 
@@ -33,7 +33,7 @@ Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This f
 ### Typography
 - Body: Inter (Latin and digits) with Noto Sans KR (Hangul). Mono: JetBrains Mono for code, logs and IDs.
 - Scale, 5 sizes (px): display 36 (KPI numbers), h1 24 (page title), h2 18 (section title), body 16, small 14 (tables, buttons, inputs, labels, timestamps). Do not add sizes.
-- Numbers in tables and KPI values use `font-variant-numeric: tabular-nums`.
+- `font-variant-numeric: tabular-nums` only where digits line up vertically: table columns and chart axes. Large standalone values (KPI numbers) keep the default proportional figures.
 - Monospace only for real data values: IDs, hashes, code, logs. Never for decorative meta labels.
 - JetBrains Mono has no Hangul, so log lines that mix Korean will not align. Accepted.
 
@@ -61,6 +61,47 @@ Taste rules (what to avoid and why) live in `patterns/frontend-taste.md`. This f
 - Status meaning (good, warning, error) uses the status colors, never chart colors, and the two are never mixed in one chart.
 - Marks: bars at most 24px thick with a 4px rounded end and a square baseline; lines 2px; end dots at least 8px with a 2px surface ring; 2px surface gap between stacked segments; 1px solid gridlines in `border`.
 - Validation (dataviz `validate_palette.js`, 2026-11-23): light on `#FFFFFF` worst adjacent CVD 9.1, normal vision 19.6, slots 3 to 5 below 3:1 (2.82, 2.17, 2.69). Dark on `#111A2B` worst adjacent CVD 8.5, normal vision 16.8, all at least 3:1. First 3 slots pass all-pairs in both modes; 4 slots fail.
+
+### Icons
+- Set: Lucide (lucide-static 1.70.0, ISC; license in `icons/LICENSE-lucide.txt`). Only the 17 files in `design/icons/`. No other icon set, no emoji, no hand-drawn SVG icons.
+- Use them for function only: inside buttons, inputs, table headers, menus, alerts, pagination and dialog close. Never as decoration next to headings or on feature cards.
+- Paste the SVG inline. Size with CSS: `size-icon-sm` (16px) inside buttons, inputs, tables and menus; `size-icon-md` (20px) in alerts and dialog close buttons. Color follows text (`currentColor`).
+- Decorative icons next to a text label get `aria-hidden="true"`. An icon-only button needs `aria-label`.
+- Need another icon: take it from lucide-static 1.70.0 (`icons/<name>.svg`), keep only drawing elements, add it here first.
+
+| File | Lucide name | Use |
+| :--- | :--- | :--- |
+| `search` | search | search input |
+| `chevron-down` / `chevron-left` / `chevron-right` | chevron-* | select, pagination |
+| `close` | x | close dialog, clear |
+| `check` | check | selected item |
+| `plus` | plus | add |
+| `download` | download | export, download |
+| `external` | external-link | open in new tab |
+| `copy` | copy | copy |
+| `refresh` | refresh-cw | reload |
+| `filter` | funnel | filter |
+| `sort` | arrow-up-down | sortable column |
+| `warning` | triangle-alert | warning alert |
+| `info` | info | info note |
+| `calendar` | calendar | date range |
+| `more` | ellipsis | row actions |
+
+### Numbers, dates and empty values
+| Item | Rule | Example |
+| :--- | :--- | :--- |
+| Thousands | Comma from 1,000. Not for years, IDs, port numbers or codes | `1,284,330` / `2026` / `8080` |
+| Decimals | Fixed per column or per metric | `0.12%`, `0.30%` |
+| Units | Space before Latin units. No space before `%`, `%p` and Korean units. Particles attach to the unit | `182 ms`, `1.2 GB` / `0.12%`, `1,284건` / `182 ms로`, `0.12%입니다` |
+| Change | Always signed. Minus is `−` (U+2212) in displayed text; machine-readable output (CSV, JSON) keeps `-` | `+4.2%`, `−6 ms`, `+0.03%p` |
+| Large numbers | Full number in KPI tiles and tables. Compact `k` / `M` only on chart axes and narrow cells | `1,284,330` / `200k`, `1.28M` |
+| Date and time (data) | `YYYY-MM-DD HH:mm`, 24-hour, year always shown. Seconds only when needed | `2026-11-22 16:05`, log `16:05:09` |
+| Range | Spaces around `~` | `2026-11-16 ~ 2026-11-22` |
+| Date in sentences and titles | Korean form | `11월 16~22일 서비스 상태` |
+| Time zone | KST is implied. Show the zone only when zones are mixed | `14:05 UTC` |
+| Relative time | Never alone; pair it with the absolute time | `3분 전 (14:05)` |
+| Empty value | `-` in `text-muted`. Zero is a value: show `0` | `-` / `0` |
+| Unavailable value | Say why, in `text-muted` | `확인 불가`, `집계 중` |
 
 ### Badges and titles
 - Status badges (success, warning, danger) appear only inside tables and lists: pill background (`radius-badge`) with text only. No dot, no icon.

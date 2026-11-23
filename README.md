@@ -14,7 +14,7 @@ Personal skills and principles for AI-assisted development (JDK 25, Kotlin 2, Sp
 - `stacks/`:
   - `spring-boot.md`, `kotlin-quality.md`, `frontend.md`.
 - `design/`:
-  - `DESIGN.md`, `tokens.json` (source), `tokens.css` (generated), `build_tokens.py`.
+  - `DESIGN.md`, `tokens.json` (source), `tokens.css` (generated), `build_tokens.py`, `icons/` (Lucide subset).
 
 ## Usage
 Reference these files in your AI tool configurations to maintain high engineering standards.

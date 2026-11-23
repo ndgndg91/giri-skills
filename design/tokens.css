@@ -78,6 +78,8 @@
   --space-cell-x: var(--space-5);
   --space-page: var(--space-10);
   --size-control: var(--space-10);
+  --size-icon-sm: var(--space-4);
+  --size-icon-md: var(--space-5);
   --radius-control: 6px;
   --radius-input: 6px;
   --radius-card: 8px;
